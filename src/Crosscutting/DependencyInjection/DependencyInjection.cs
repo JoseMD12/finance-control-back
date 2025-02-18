@@ -1,5 +1,8 @@
+using Data.Context;
+using Domain.Interface.Services.Teste;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Service.Services.Teste;
 
 namespace Crosscutting.DependencyInjection
 {
@@ -7,10 +10,39 @@ namespace Crosscutting.DependencyInjection
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(options =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Your API", Version = "v1" });
+                options.SwaggerDoc(
+                    "v1",
+                    new OpenApiInfo
+                    {
+                        Title = "Finance Control API",
+                        Version = "v1",
+                        Description =
+                            "API developed by José Henrique Martins Dotta. It is a simple API to control your finances.",
+                        Contact = new OpenApiContact
+                        {
+                            Name = "José Henrique Martins Dotta",
+                            Email = "josehmd.dev@gmail.com",
+                        },
+
+                    }
+                );
             });
+
+            services.AddCors(x =>
+                x.AddPolicy("AllowAll", policy =>
+                {
+                    policy.AllowAnyHeader();
+                    policy.AllowAnyMethod();
+                    policy.AllowAnyOrigin();
+                    policy.AllowCredentials();
+                })
+            );
+
+            services.AddTransient<ITesteService, TesteService>();
+
+            services.AddSingleton(typeof(PostgresDbContextFactory));
 
             return services;
         }
