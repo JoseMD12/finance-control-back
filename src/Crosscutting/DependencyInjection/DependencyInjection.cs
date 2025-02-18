@@ -1,5 +1,7 @@
+using System.Reflection.Metadata;
 using Data.Context;
 using Domain.Interface.Services.Teste;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Service.Services.Teste;
@@ -8,7 +10,7 @@ namespace Crosscutting.DependencyInjection
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSwaggerGen(options =>
             {
@@ -42,7 +44,8 @@ namespace Crosscutting.DependencyInjection
 
             services.AddTransient<ITesteService, TesteService>();
 
-            services.AddSingleton(typeof(PostgresDbContextFactory));
+            services.AddSingleton(x =>
+               new PostgresDbContextFactory(configuration));
 
             return services;
         }
