@@ -1,10 +1,11 @@
-using System.Reflection.Metadata;
 using Data.Context;
-using Domain.Interface.Services.Teste;
+using Data.Repositories;
+using Domain.Interface.Repositories;
+using Domain.Interface.Services.User;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
-using Service.Services.Teste;
+using Service.Services.User;
 
 namespace Crosscutting.DependencyInjection
 {
@@ -32,17 +33,18 @@ namespace Crosscutting.DependencyInjection
                 );
             });
 
-            services.AddCors(x =>
-                x.AddPolicy("AllowAll", policy =>
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", policy =>
                 {
-                    policy.AllowAnyHeader();
-                    policy.AllowAnyMethod();
-                    policy.AllowAnyOrigin();
-                    policy.AllowCredentials();
-                })
-            );
+                    policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+                });
+            });
 
-            services.AddTransient<ITesteService, TesteService>();
+            services.AddTransient<IUserService, UserService>();
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             services.AddSingleton(x =>
                new PostgresDbContextFactory(configuration));
