@@ -9,6 +9,7 @@ namespace Domain.Dtos.User
 {
     public class UserDTO
     {
+        public string? Id { get; set; }
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         [EmailAddress]

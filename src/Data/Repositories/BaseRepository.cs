@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Data.Context;
+using Domain.Dtos;
 using Domain.Entities;
 using Domain.Interface.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +15,17 @@ namespace Data.Repositories
     {
         private readonly PostgresDbContextFactory _dbContextFactory = dbContextFactory;
 
-        public async Task<Guid> Insert(T entity)
+        public async Task<Result<Guid, Error>> Insert(T entity)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
             {
+                if (entity.Id == Guid.Empty)
+                {
+                    entity.Id = Guid.NewGuid();
+                }
+
+                entity.CreatedAt = DateTime.UtcNow;
                 context.Set<T>();
                 var entry = context.Add(entity);
                 await context.SaveChangesAsync();
@@ -25,7 +33,7 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                throw;
+                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
             }
             finally
             {
@@ -33,18 +41,30 @@ namespace Data.Repositories
             }
         }
 
-        public async Task InsertRange(List<T> entities)
+        public async Task<Result<List<T>?, Error>> InsertRange(List<T> entities)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
             {
+                entities.ForEach(x =>
+                {
+                    if (x.Id == Guid.Empty)
+                    {
+                        x.Id = Guid.NewGuid();
+                    }
+
+                    x.CreatedAt = DateTime.UtcNow;
+                });
+
                 context.Set<T>();
                 context.AddRange(entities);
                 await context.SaveChangesAsync();
+
+                return new();
             }
             catch (Exception)
             {
-                throw;
+                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
             }
             finally
             {
@@ -52,7 +72,7 @@ namespace Data.Repositories
             }
         }
 
-        public async Task<List<T>> GetAll()
+        public async Task<Result<List<T>, Error>> GetAll()
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
@@ -62,7 +82,7 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                throw;
+                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
             }
             finally
             {
@@ -70,7 +90,7 @@ namespace Data.Repositories
             }
         }
 
-        public async Task<T?> GetById(Guid id)
+        public async Task<Result<T, Error>> GetById(Guid id)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
@@ -88,11 +108,19 @@ namespace Data.Repositories
             }
         }
 
-        public async Task<T> Update(T entity)
+        public async Task<Result<T, Error>> Update(T entity)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
             {
+                var result = await context.Set<T>().FirstOrDefaultAsync(x => x.Id == entity.Id);
+                if (result == null || result == default)
+                {
+                    throw new Exception("Entity not found");
+                }
+
+                entity.UpdatedAt = DateTime.UtcNow;
+
                 context.Set<T>();
                 var entry = context.Update(entity);
                 await context.SaveChangesAsync();
@@ -109,19 +137,24 @@ namespace Data.Repositories
             }
         }
 
-        public async Task<bool> Delete(T entity)
+        public async Task<Result<bool, Error>> Delete(T entity)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
             {
                 context.Set<T>();
-                context.Remove(entity);
+                var removedEntity = context.Remove(entity);
+                if (removedEntity == null || removedEntity == default)
+                {
+                    return false;
+                }
+
                 await context.SaveChangesAsync();
                 return true;
             }
             catch (Exception)
             {
-                return false;
+                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
             }
             finally
             {
@@ -129,7 +162,7 @@ namespace Data.Repositories
             }
         }
 
-        public async Task<bool> DeleteById(Guid id)
+        public async Task<Result<bool, Error>> DeleteById(Guid id)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
@@ -145,7 +178,7 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return false;
+                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
             }
             finally
             {
@@ -153,7 +186,7 @@ namespace Data.Repositories
             }
         }
 
-        public async Task<bool> DeleteRange(List<T> entities)
+        public async Task<Result<bool, Error>> DeleteRange(List<T> entities)
         {
             using var context = _dbContextFactory.CreateDbContext([]);
             try
@@ -164,7 +197,7 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return false;
+                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
             }
             finally
             {

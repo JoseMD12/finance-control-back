@@ -22,27 +22,41 @@ namespace Application.Controllers.User
             }
 
             var userId = await _userService.CreateUser(user);
-            return Ok(userId);
+            if (!userId.IsOk)
+            {
+                return BadRequest(userId.ErrorValue);
+            }
+
+            return Ok(userId.Value);
         }
 
         [HttpGet("list")]
         public async Task<ActionResult> GetAll()
         {
             var users = await _userService.GetAll();
-            return Ok(users);
+            if (!users.IsOk)
+            {
+                return BadRequest(users.ErrorValue);
+            }
+            return Ok(users.Value);
         }
 
-        // [HttpPut("update")]
-        // [Route("{id}")]
-        // public async Task<ActionResult> Update(string id, [FromBody] UserDTO user)
-        // {
-        //     if (!ModelState.IsValid)
-        //     {
-        //         return BadRequest(ModelState);
-        //     }
+        [HttpPut("update")]
+        [Route("{id}")]
+        public async Task<ActionResult> Update(string id, [FromBody] UserDTO user)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
 
-        //     await _userService.UpdateUser(id, user);
-        //     return Ok();
-        // }
+            var userEntity = await _userService.UpdateUser(id, user);
+            if (!userEntity.IsOk)
+            {
+                return BadRequest(userEntity.ErrorValue);
+            }
+
+            return Ok(userEntity.Value);
+        }
     }
 }

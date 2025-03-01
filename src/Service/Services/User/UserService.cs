@@ -1,7 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
+using System.Net;
+using Domain.Dtos;
 using Domain.Dtos.User;
 using Domain.Entities;
 using Domain.Interface.Repositories;
@@ -12,14 +11,22 @@ namespace Service.Services.User
     public class UserService(IBaseRepository<UserEntity> userRepository) : IUserService
     {
         private readonly IBaseRepository<UserEntity> _userRepository = userRepository;
-        public async Task<Guid> CreateUser(UserDTO user)
+        public async Task<Result<Guid, Error>> CreateUser(UserDTO user)
         {
             var users = await _userRepository.GetAll();
-            var emailExists = users.Any(x => x.Email == user.Email);
+            if (!users.IsOk)
+            {
+                return users.ErrorValue;
+            }
+
+            var emailExists = users.Value.Any(x => x.Email == user.Email);
             if (emailExists)
             {
-                throw new Exception("Email already exists");
+                return new Error(HttpStatusCode.BadRequest, "Email já cadastrado!");
             }
+
+            var salt = BCrypt.Net.BCrypt.GenerateSalt();
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password, salt);
 
             var userEntityPayload = new UserEntity()
             {
@@ -33,38 +40,56 @@ namespace Service.Services.User
             return userEntity;
         }
 
-        public async Task<List<UserEntity>> GetAll()
+        public async Task<Result<List<UserDTO>, Error>> GetAll()
         {
             var users = await _userRepository.GetAll();
-            return [.. users.Select(x => new UserEntity()
+            if (!users.IsOk)
             {
-                Id = x.Id,
+                return users.ErrorValue;
+            }
+
+            return users.Value.Select(x => new UserDTO()
+            {
+                Id = x.Id.ToString(),
                 FirstName = x.FirstName,
                 LastName = x.LastName,
                 Email = x.Email,
-                Password = string.Empty
-            })];
+                Password = x.Password
+            }).ToList();
         }
 
-        // public async Task<UserEntity> UpdateUser(string id, UserDTO user)
-        // {
-        //     var guidIsValid = Guid.TryParse(id, out Guid userId);
+        public async Task<Result<UserDTO, Error>> UpdateUser(string id, UserDTO user)
+        {
+            var guidIsValid = Guid.TryParse(id, out Guid userId);
 
-        //     if (!guidIsValid)
-        //     {
-        //         throw new Exception("Id is not valid");
-        //     }
+            if (!guidIsValid || userId == Guid.Empty)
+            {
+                return new Error(HttpStatusCode.BadRequest, "Identificador inválido");
+            }
 
-        //     var userEntity = new UserEntity()
-        //     {
-        //         Id = userId,
-        //         FirstName = user.FirstName,
-        //         LastName = user.LastName,
-        //         Email = user.Email,
-        //         Password = user.Password,
-        //     };
+            var userEntity = new UserEntity()
+            {
+                Id = userId,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Password = user.Password,
+            };
 
-        //     await _userRepository.Update(userEntity);
-        // }
+            var entity = await _userRepository.Update(userEntity);
+            if (!entity.IsOk)
+            {
+                return entity.ErrorValue;
+            }
+
+            return new UserDTO()
+            {
+                Id = entity.Value.Id.ToString(),
+                FirstName = entity.Value.FirstName,
+                LastName = entity.Value.LastName,
+                Email = entity.Value.Email,
+                Password = string.Empty
+            };
+        }
     }
 }
