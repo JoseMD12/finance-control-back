@@ -1,10 +1,12 @@
 using Data.Context;
 using Data.Repositories;
 using Domain.Interface.Repositories;
+using Domain.Interface.Services.Auth;
 using Domain.Interface.Services.User;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Service.Services.Auth;
 using Service.Services.User;
 
 namespace Crosscutting.DependencyInjection
@@ -44,6 +46,7 @@ namespace Crosscutting.DependencyInjection
             });
 
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ILoginService, LoginService>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             services.AddSingleton(x =>
