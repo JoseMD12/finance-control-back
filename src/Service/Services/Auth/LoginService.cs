@@ -8,9 +8,11 @@ using Domain.Interface.Services.User;
 
 namespace Service.Services.Auth
 {
-    public class LoginService(IUserService userService) : ILoginService
+    public class LoginService(IUserService userService, ITokenService tokenService) : ILoginService
     {
         private readonly IUserService _userService = userService;
+        private readonly ITokenService _tokenService = tokenService;
+
         public async Task<Result<string, Error>> Login(string email, string password)
         {
             var users = await _userService.GetAll();
@@ -31,7 +33,13 @@ namespace Service.Services.Auth
                 return Error.Unauthorized("Senha inválida!");
             }
 
-            return user.Id.ToString();
+            var token = _tokenService.GenerateToken(user);
+            if (!token.IsOk)
+            {
+                return token.ErrorValue;
+            }
+
+            return token.Value;
         }
     }
 }

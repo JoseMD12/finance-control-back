@@ -1,5 +1,6 @@
 using Data.Context;
 using Data.Repositories;
+using Domain.Dtos.Auth;
 using Domain.Interface.Repositories;
 using Domain.Interface.Services.Auth;
 using Domain.Interface.Services.User;
@@ -45,8 +46,17 @@ namespace Crosscutting.DependencyInjection
                 });
             });
 
+            var configurationSection = configuration.GetSection("JwtSettings");
+            services.Configure<JwtConfigurationDTO>(configuration.GetSection("JwtSettings"));
+            services.AddSingleton(new JwtConfigurationDTO
+            {
+                SecretKey = configurationSection["SecretKey"] ?? throw new ArgumentNullException("SecretKey"),
+                ExpirationInMinutes = int.Parse(configurationSection["ExpirationInMinutes"] ?? 60.ToString()),
+            });
+
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ILoginService, LoginService>();
+            services.AddTransient<ITokenService, TokenService>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
 
             services.AddSingleton(x =>
