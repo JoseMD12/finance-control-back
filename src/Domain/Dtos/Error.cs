@@ -8,7 +8,6 @@ namespace Domain.Dtos
         private HttpStatusCode Code { get; } = code;
         private string Message { get; } = message;
 
-        public override string ToString() => $"{Code}: {Message}";
         public static Error BadRequest(string message) => new(HttpStatusCode.BadRequest, message);
         public static Error NotFound(string message) => new(HttpStatusCode.NotFound, message);
         public static Error InternalServerError(string message) => new(HttpStatusCode.InternalServerError, message);
@@ -17,5 +16,6 @@ namespace Domain.Dtos
 
         public string MessageValue => Message;
         public HttpStatusCode CodeValue => Code;
+        public override string ToString() => $"{Code}: {Message}";
     }
 }

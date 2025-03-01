@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Application.Utils;
 using Domain.Dtos.User;
 using Domain.Interface.Services.User;
 using Microsoft.AspNetCore.Mvc;
@@ -18,13 +19,14 @@ namespace Application.Controllers.User
         {
             if (!ModelState.IsValid)
             {
+                //! arrumar a resposta do ModelState
                 return BadRequest(ModelState);
             }
 
             var userId = await _userService.CreateUser(user);
             if (!userId.IsOk)
             {
-                return BadRequest(userId.ErrorValue);
+                return ParseError.Execute(userId.ErrorValue);
             }
 
             return Ok(userId.Value);
@@ -36,7 +38,7 @@ namespace Application.Controllers.User
             var users = await _userService.GetAll();
             if (!users.IsOk)
             {
-                return BadRequest(users.ErrorValue);
+                return ParseError.Execute(users.ErrorValue);
             }
             return Ok(users.Value);
         }
@@ -53,7 +55,7 @@ namespace Application.Controllers.User
             var userEntity = await _userService.UpdateUser(id, user);
             if (!userEntity.IsOk)
             {
-                return BadRequest(userEntity.ErrorValue);
+                return ParseError.Execute(userEntity.ErrorValue);
             }
 
             return Ok(userEntity.Value);

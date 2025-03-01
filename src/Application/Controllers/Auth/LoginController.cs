@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Application.Utils;
 using Domain.Dtos;
 using Domain.Interface.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace Application.Controllers.Auth
                 var token = await _loginService.Login(email, password);
                 if (!token.IsOk)
                 {
-                    return Unauthorized(token.ErrorValue.MessageValue);
+                    return ParseError.Execute(token.ErrorValue);
                 }
 
                 return Ok(new
