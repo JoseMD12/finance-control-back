@@ -5,7 +5,9 @@ using System.Threading.Tasks;
 using Application.Utils;
 using Domain.Dtos.User;
 using Domain.Interface.Services.User;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Utils.Tools;
 
 namespace Application.Controllers.User
 {
@@ -19,7 +21,6 @@ namespace Application.Controllers.User
         {
             if (!ModelState.IsValid)
             {
-                //! arrumar a resposta do ModelState
                 return BadRequest(ModelState);
             }
 
@@ -33,6 +34,7 @@ namespace Application.Controllers.User
         }
 
         [HttpGet("list")]
+        [Authorize]
         public async Task<ActionResult> GetAll()
         {
             var users = await _userService.GetAll();

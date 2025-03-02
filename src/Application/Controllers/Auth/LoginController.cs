@@ -48,6 +48,5 @@ namespace Application.Controllers.Auth
                 return BadRequest("Autorização incompleta!");
             }
         }
-
     }
 }

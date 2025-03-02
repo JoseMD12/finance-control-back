@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 using Domain.Dtos;
 using Domain.Dtos.Auth;
 using Domain.Dtos.User;
-using Domain.Entities;
 using Domain.Interface.Services.Auth;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
+using Utils.Tools;
 
 namespace Service.Services.Auth
 {
@@ -21,7 +17,6 @@ namespace Service.Services.Auth
         {
             try
             {
-                Console.WriteLine(_jwtSettings.SecretKey);
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
@@ -29,45 +24,23 @@ namespace Service.Services.Auth
                 {
                     Subject = new ClaimsIdentity(
                     [
-                        new Claim(ClaimTypes.NameIdentifier, user.Id!.ToString()),
-                        new Claim(ClaimTypes.Email, user.Email),
+                        new Claim("id", user.Id!.ToString()),
+                        new Claim("email", user.Email),
                     ]),
                     Expires = DateTime.UtcNow.AddMinutes(120),
-                    SigningCredentials = credentials
+                    SigningCredentials = credentials,
+                    Issuer = _jwtSettings.Issuer,
+                    Audience = _jwtSettings.Audience
                 };
 
                 var tokenHandler = new JsonWebTokenHandler();
                 var token = tokenHandler.CreateToken(tokenDescriptor);
 
-                return tokenHandler.CreateToken(token);
+                return token;
             }
             catch (Exception)
             {
                 return Error.InternalServerError("Falha ao gerar token! Contate a equipe de desenvolvimento.");
-            }
-        }
-
-        public Result<bool, Error> ValidateToken(string token)
-        {
-            try
-            {
-                // var tokenHandler = new JsonWebTokenHandler();
-                // var validationParameters = new TokenValidationParameters
-                // {
-                //     ValidateIssuerSigningKey = true,
-                //     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
-                //     ValidateIssuer = false,
-                //     ValidateAudience = false,
-                //     ClockSkew = TimeSpan.Zero
-                // };
-
-                // tokenHandler.ValidateToken(token, validationParameters, out SecurityToken validatedToken);
-
-                return true;
-            }
-            catch (Exception)
-            {
-                return false;
             }
         }
     }

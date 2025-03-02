@@ -58,6 +58,30 @@ namespace Service.Services.User
             }).ToList();
         }
 
+        public async Task<Result<UserDTO, Error>> GetByEmail(string email)
+        {
+            var users = await _userRepository.GetAll();
+            if (!users.IsOk)
+            {
+                return users.ErrorValue;
+            }
+
+            var user = users.Value.FirstOrDefault(x => x.Email == email);
+            if (user == null)
+            {
+                return new Error(HttpStatusCode.NotFound, "Usuário nao encontrado!");
+            }
+
+            return new UserDTO()
+            {
+                Id = user.Id.ToString(),
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Password = string.Empty
+            };
+        }
+
         public async Task<Result<UserDTO, Error>> UpdateUser(string id, UserDTO user)
         {
             var guidIsValid = Guid.TryParse(id, out Guid userId);

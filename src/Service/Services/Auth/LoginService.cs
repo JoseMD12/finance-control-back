@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Domain.Dtos;
 using Domain.Interface.Services.Auth;
 using Domain.Interface.Services.User;
+using Utils.Tools;
 
 namespace Service.Services.Auth
 {
@@ -34,6 +35,7 @@ namespace Service.Services.Auth
             }
 
             var token = _tokenService.GenerateToken(user);
+
             if (!token.IsOk)
             {
                 return token.ErrorValue;

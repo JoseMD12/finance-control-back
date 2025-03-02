@@ -12,6 +12,7 @@ namespace Domain.Interface.Services.User
     {
         public Task<Result<Guid, Error>> CreateUser(UserDTO user);
         public Task<Result<List<UserDTO>, Error>> GetAll();
+        public Task<Result<UserDTO, Error>> GetByEmail(string email);
         public Task<Result<UserDTO, Error>> UpdateUser(string id, UserDTO user);
     }
 }
