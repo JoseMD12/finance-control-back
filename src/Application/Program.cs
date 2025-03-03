@@ -1,4 +1,4 @@
-using Crosscutting.DependencyInjection;
+using Crosscutting.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 

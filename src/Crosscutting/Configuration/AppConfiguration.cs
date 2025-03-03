@@ -13,9 +13,9 @@ using Microsoft.OpenApi.Models;
 using Service.Services.Auth;
 using Service.Services.User;
 
-namespace Crosscutting.DependencyInjection
+namespace Crosscutting.Configuration
 {
-    public static class DependencyInjection
+    public static class AppConfiguration
     {
         public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
         {
@@ -77,16 +77,9 @@ namespace Crosscutting.DependencyInjection
                 };
             });
 
-            // Add authorization services
             services.AddAuthorization();
-
-
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<ILoginService, LoginService>();
-            services.AddTransient<ITokenService, TokenService>();
-            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddSingleton(x =>
-               new PostgresDbContextFactory(configuration));
+            RepositoryInjection.Execute(services, configuration);
+            ServiceInjection.Execute(services);
 
             return services;
         }
