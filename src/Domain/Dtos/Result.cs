@@ -14,6 +14,7 @@ public readonly struct Result<T, Error>
     public bool IsOk => _success;
 
     public static implicit operator Result<T, Error>(T v) => new(v, default!, true);
+
     public static implicit operator Result<T, Error>(Error e) => new(default!, e, false);
 
     // public R Match<R>(

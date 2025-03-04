@@ -12,16 +12,10 @@ namespace Application.Utils
             var settings = new JsonSerializerOptions
             {
                 WriteIndented = true,
-                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
             };
 
-            var message = JsonSerializer.Serialize(
-                new
-                {
-                    message = e.MessageValue
-                },
-                settings
-            );
+            var message = JsonSerializer.Serialize(new { message = e.MessageValue }, settings);
 
             ActionResult result = e.CodeValue switch
             {
@@ -30,7 +24,11 @@ namespace Application.Utils
                 HttpStatusCode.Forbidden => new ForbidResult(message),
                 HttpStatusCode.Unauthorized => new UnauthorizedResult(),
                 HttpStatusCode.NoContent => new NoContentResult(),
-                HttpStatusCode.InternalServerError => new ObjectResult(e) { StatusCode = (int)HttpStatusCode.InternalServerError, Value = message },
+                HttpStatusCode.InternalServerError => new ObjectResult(e)
+                {
+                    StatusCode = (int)HttpStatusCode.InternalServerError,
+                    Value = message,
+                },
                 _ => new BadRequestObjectResult(e),
             };
             return result;

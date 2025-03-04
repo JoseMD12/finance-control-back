@@ -1,8 +1,7 @@
-
 using System.Net;
 using Domain.Dtos;
 using Domain.Dtos.User;
-using Domain.Entities;
+using Domain.Entities.User;
 using Domain.Interface.Repositories;
 using Domain.Interface.Services.User;
 
@@ -11,6 +10,7 @@ namespace Service.Services.User
     public class UserService(IBaseRepository<UserEntity> userRepository) : IUserService
     {
         private readonly IBaseRepository<UserEntity> _userRepository = userRepository;
+
         public async Task<Result<Guid, Error>> CreateUser(UserDTO user)
         {
             var users = await _userRepository.GetAll();
@@ -48,14 +48,16 @@ namespace Service.Services.User
                 return users.ErrorValue;
             }
 
-            return users.Value.Select(x => new UserDTO()
-            {
-                Id = x.Id.ToString(),
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                Email = x.Email,
-                Password = x.Password
-            }).ToList();
+            return users
+                .Value.Select(x => new UserDTO()
+                {
+                    Id = x.Id.ToString(),
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Email = x.Email,
+                    Password = x.Password,
+                })
+                .ToList();
         }
 
         public async Task<Result<UserDTO, Error>> GetByEmail(string email)
@@ -78,7 +80,7 @@ namespace Service.Services.User
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Password = string.Empty
+                Password = string.Empty,
             };
         }
 
@@ -112,7 +114,7 @@ namespace Service.Services.User
                 FirstName = entity.Value.FirstName,
                 LastName = entity.Value.LastName,
                 Email = entity.Value.Email,
-                Password = string.Empty
+                Password = string.Empty,
             };
         }
     }

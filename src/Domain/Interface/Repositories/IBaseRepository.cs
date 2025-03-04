@@ -7,7 +7,8 @@ using Domain.Entities;
 
 namespace Domain.Interface.Repositories
 {
-    public interface IBaseRepository<T> where T : BaseEntity
+    public interface IBaseRepository<T>
+        where T : BaseEntity
     {
         public Task<Result<Guid, Error>> Insert(T entity);
         public Task<Result<List<T>?, Error>> InsertRange(List<T> entities);

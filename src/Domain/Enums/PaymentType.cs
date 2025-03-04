@@ -5,6 +5,6 @@ namespace Domain.Enums
         CREDIT = 0,
         DEBIT = 1,
         PIX = 2,
-        TRANSFER = 3
+        TRANSFER = 3,
     }
 }

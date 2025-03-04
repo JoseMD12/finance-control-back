@@ -25,7 +25,9 @@ namespace Application.Controllers.Auth
             {
                 string encodedUsernamePassword = authHeader["Basic ".Length..].Trim();
                 Encoding encoding = Encoding.GetEncoding("iso-8859-1");
-                string usernamePassword = encoding.GetString(Convert.FromBase64String(encodedUsernamePassword));
+                string usernamePassword = encoding.GetString(
+                    Convert.FromBase64String(encodedUsernamePassword)
+                );
 
                 int seperatorIndex = usernamePassword.IndexOf(':');
 
@@ -38,10 +40,7 @@ namespace Application.Controllers.Auth
                     return ParseError.Execute(token.ErrorValue);
                 }
 
-                return Ok(new
-                {
-                    Token = token.Value
-                });
+                return Ok(new { Token = token.Value });
             }
             else
             {

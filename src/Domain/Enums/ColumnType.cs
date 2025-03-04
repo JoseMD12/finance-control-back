@@ -11,7 +11,6 @@ namespace Domain.Enums
         MONETARY_VALUE = 1,
         DATE = 2,
         CATEGORY = 3,
-        MOVEMENT_TYPE = 4
-
+        MOVEMENT_TYPE = 4,
     }
 }

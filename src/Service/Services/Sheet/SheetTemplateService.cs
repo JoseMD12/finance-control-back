@@ -6,26 +6,35 @@ using Domain.Dtos;
 using Domain.Dtos.Sheets;
 using Domain.Entities.Sheet;
 using Domain.Interface.Repositories;
+using Domain.Interface.Services.Sheet;
 
 namespace Service.Services.Sheet
 {
-    public class TemplateSheetService(IBaseRepository<SheetTemplateEntity> repository)
+    public class SheetTemplateService(ISheetTemplateRepository repository) : ISheetTemplateService
     {
-        private readonly IBaseRepository<SheetTemplateEntity> _repository = repository;
+        private readonly ISheetTemplateRepository _repository = repository;
 
         public async Task<Result<List<SheetTemplateDTO>, Error>> GetAll()
         {
             var templates = await _repository.GetAll();
-            // return templates.Value.Select(x => new SheetTemplateDTO()
-            // {
-            //     Id = x.Id.ToString(),
-            //     Name = x.Name,
-            //     Description = x.Description
-            // }).ToList();
 
-            return new();
+            if (!templates.IsOk)
+            {
+                return templates.ErrorValue;
+            }
+
+            return templates.Value.Select(x => new SheetTemplateDTO()
+            {
+                Id = x.Id.ToString(),
+                ColorHex = x.ColorHex,
+                TemplateName = x.TemplateName,
+                Columns = [.. x.Columns.Select(y => new ColumnTypeValuePairDTO()
+                {
+                    Id = y.Id.ToString(),
+                    ColumnType = y.ColumnType,
+                    Value = y.Value
+                })]
+            }).ToList();
         }
-
-
     }
 }

@@ -17,7 +17,10 @@ namespace Crosscutting.Configuration
 {
     public static class AppConfiguration
     {
-        public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddApplicationServices(
+            this IServiceCollection services,
+            IConfiguration configuration
+        )
         {
             services.AddSwaggerGen(options =>
             {
@@ -34,48 +37,60 @@ namespace Crosscutting.Configuration
                             Name = "José Henrique Martins Dotta",
                             Email = "josehmd.dev@gmail.com",
                         },
-
                     }
                 );
             });
 
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowAll", policy =>
-                {
-                    policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader();
-                });
+                options.AddPolicy(
+                    "AllowAll",
+                    policy =>
+                    {
+                        policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                    }
+                );
             });
 
             var configurationSection = configuration.GetSection("JwtSettings");
             services.Configure<JwtConfigurationDTO>(configuration.GetSection("JwtSettings"));
-            services.AddSingleton(new JwtConfigurationDTO
-            {
-                SecretKey = configurationSection["SecretKey"] ?? throw new ArgumentNullException("SecretKey"),
-                ExpirationInMinutes = int.Parse(configurationSection["ExpirationInMinutes"] ?? 60.ToString()),
-                Issuer = configurationSection["Issuer"] ?? throw new ArgumentNullException("Issuer"),
-                Audience = configurationSection["Audience"] ?? throw new ArgumentNullException("Audience"),
-            });
-
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+            services.AddSingleton(
+                new JwtConfigurationDTO
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configurationSection["SecretKey"]!)),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                };
-            });
+                    SecretKey =
+                        configurationSection["SecretKey"]
+                        ?? throw new ArgumentNullException("SecretKey"),
+                    ExpirationInMinutes = int.Parse(
+                        configurationSection["ExpirationInMinutes"] ?? 60.ToString()
+                    ),
+                    Issuer =
+                        configurationSection["Issuer"] ?? throw new ArgumentNullException("Issuer"),
+                    Audience =
+                        configurationSection["Audience"]
+                        ?? throw new ArgumentNullException("Audience"),
+                }
+            );
+
+            services
+                .AddAuthentication(options =>
+                {
+                    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                })
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.ASCII.GetBytes(configurationSection["SecretKey"]!)
+                        ),
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero,
+                    };
+                });
 
             services.AddAuthorization();
             RepositoryInjection.Execute(services, configuration);

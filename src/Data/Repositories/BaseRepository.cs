@@ -11,9 +11,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Data.Repositories
 {
-    public class BaseRepository<T>(PostgresDbContextFactory dbContextFactory) : IBaseRepository<T> where T : BaseEntity
+    public class BaseRepository<T>(PostgresDbContextFactory dbContextFactory) : IBaseRepository<T>
+        where T : BaseEntity
     {
-        private readonly PostgresDbContextFactory _dbContextFactory = dbContextFactory;
+        protected readonly PostgresDbContextFactory _dbContextFactory = dbContextFactory;
 
         public async Task<Result<Guid, Error>> Insert(T entity)
         {
@@ -33,7 +34,9 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
@@ -64,7 +67,9 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
@@ -82,7 +87,9 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
@@ -96,11 +103,16 @@ namespace Data.Repositories
             try
             {
                 var entity = await context.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
+                if (entity == null)
+                {
+                    return Error.NotFound("Entidade nao encontrada!");
+                }
+
                 return entity;
             }
             catch (Exception)
             {
-                throw;
+                return Error.NotFound("Entidade não encontrada!");
             }
             finally
             {
@@ -129,7 +141,9 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                throw;
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
@@ -154,7 +168,9 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
@@ -178,7 +194,9 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
@@ -197,14 +215,14 @@ namespace Data.Repositories
             }
             catch (Exception)
             {
-                return Error.InternalServerError("Algo deu errado! Contate a equipe de desenvolvimento.");
+                return Error.InternalServerError(
+                    "Algo deu errado! Contate a equipe de desenvolvimento."
+                );
             }
             finally
             {
                 context.Dispose();
             }
         }
-
-
     }
 }

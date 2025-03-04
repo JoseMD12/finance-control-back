@@ -16,6 +16,7 @@ namespace Application.Controllers.User
     public class UserController(IUserService userService) : ControllerBase
     {
         private readonly IUserService _userService = userService;
+
         [HttpPost("create")]
         public async Task<ActionResult> Post([FromBody] UserDTO user)
         {

@@ -11,14 +11,13 @@ namespace Utils.Tools
     {
         public static void Print(string prefix, object obj)
         {
-
             var message = JsonSerializer.Serialize(
                 obj,
                 new JsonSerializerOptions
                 {
                     WriteIndented = true,
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    ReferenceHandler = ReferenceHandler.IgnoreCycles
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 }
             );
 
@@ -33,7 +32,7 @@ namespace Utils.Tools
                 {
                     WriteIndented = true,
                     Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-                    ReferenceHandler = ReferenceHandler.IgnoreCycles
+                    ReferenceHandler = ReferenceHandler.IgnoreCycles,
                 }
             );
 

@@ -16,11 +16,15 @@ namespace Data.Context
         public PostgresDbContextFactory()
         {
             var basePath = Directory.GetCurrentDirectory();
-            var appsettingsPath = Path.GetFullPath(Path.Combine(basePath, "../../src/Application/appsettings.json"));
+            var appsettingsPath = Path.GetFullPath(
+                Path.Combine(basePath, "../../src/Application/appsettings.json")
+            );
 
             if (!File.Exists(appsettingsPath))
             {
-                throw new FileNotFoundException($"appsettings.json not found at: {appsettingsPath}");
+                throw new FileNotFoundException(
+                    $"appsettings.json not found at: {appsettingsPath}"
+                );
             }
 
             _configuration = new ConfigurationBuilder()

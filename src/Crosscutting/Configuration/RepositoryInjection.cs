@@ -12,11 +12,15 @@ namespace Crosscutting.Configuration
 {
     public static class RepositoryInjection
     {
-        public static IServiceCollection Execute(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection Execute(
+            this IServiceCollection services,
+            IConfiguration configuration
+        )
         {
+            services.AddSingleton(x => new PostgresDbContextFactory(configuration));
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-            services.AddSingleton(x =>
-               new PostgresDbContextFactory(configuration));
+
+            services.AddScoped<ISheetTemplateRepository, SheetTemplateRepository>();
 
             return services;
         }

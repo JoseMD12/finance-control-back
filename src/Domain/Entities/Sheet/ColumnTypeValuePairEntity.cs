@@ -6,7 +6,7 @@ using Domain.Enums;
 
 namespace Domain.Entities.Sheet
 {
-    public class ColumnTypeValuePairEntity
+    public class ColumnTypeValuePairEntity : BaseEntity
     {
         public ColumnType ColumnType { get; set; }
         public string Value { get; set; } = string.Empty;
