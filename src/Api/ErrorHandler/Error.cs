@@ -14,8 +14,10 @@ namespace Api.ErrorHandler
             var stackTrace = ex.StackTrace;
             var innerException = ex.InnerException;
             var statusCodeString = ex.Data["StatusCode"] ?? null;
-            var statusCode = statusCodeString != null ? (int)statusCodeString : 500;
+            var statusCode = int.TryParse(statusCodeString?.ToString()?.Trim(), out var code) ? code : 500;
 
+            Console.WriteLine();
+            Console.WriteLine("== Handling Error ==");
             Console.WriteLine("Error Message: " + message);
             Console.WriteLine("Stack Trace: " + stackTrace);
             if (innerException != null)

@@ -2,7 +2,7 @@ using System.Security.Claims;
 using Application.Interfaces.Auth;
 using Domain.Entities;
 using Domain.Error;
-using Domain.Interfaces;
+using Infrastructure.Interfaces;
 
 namespace Application.Service.Auth
 {
@@ -13,9 +13,9 @@ namespace Application.Service.Auth
 
         public async Task<ClaimsPrincipal> Execute(string authHeader)
         {
-            var (email, password) = _decodeBasicAuth.Execute(authHeader);
+            (string email, string password) = _decodeBasicAuth.Execute(authHeader);
 
-            User user = await _repository.GetUserByEmailAsync(email)
+            User user = await _repository.GetByEmailAsync(email)
                 ?? throw Error.ParseError("User not found", 404);
 
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);

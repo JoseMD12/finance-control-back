@@ -1,17 +1,12 @@
-using Infrastructure.Context;
+using Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
 
-var app = builder.Build();
-
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
-
 PostgresContext.CreateDbContext(builder.Services, builder.Configuration);
+Infrastructure.DependencyInjection.Configure.Execute(builder.Services);
+Application.DependencyInjection.Configure.Execute(builder.Services);
 
 builder.Services.AddAuthentication("AppCookie")
     .AddCookie("AppCookie", options =>
@@ -30,6 +25,15 @@ builder.Services.AddAuthorizationBuilder()
     });
 
 builder.Services.AddControllers();
+
+
+
+var app = builder.Build();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

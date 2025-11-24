@@ -14,7 +14,7 @@ namespace Application.Service.Auth
 
             var parts = decoded.Split(':', 2);
             if (parts.Length != 2)
-                throw new Error();
+                throw Error.ParseError("Invalid Authorization header format", 400);
 
             var email = parts[0];
             var password = parts[1];

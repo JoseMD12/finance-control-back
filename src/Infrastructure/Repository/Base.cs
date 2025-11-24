@@ -1,16 +1,17 @@
 using Domain.Entities;
 using Domain.Error;
-using Infrastructure.Interfaces.Repository;
+using Infrastructure.Persistence;
+using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository
 {
     public class Base<T> : IBase<T> where T : TEntity
     {
-        private readonly DbContext _context;
-        private readonly DbSet<T> _dbSet;
+        private readonly PostgresContext _context;
+        protected readonly DbSet<T> _dbSet;
 
-        public Base(DbContext context)
+        public Base(PostgresContext context)
         {
             _context = context;
             _dbSet = _context.Set<T>();

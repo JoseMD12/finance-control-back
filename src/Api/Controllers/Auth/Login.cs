@@ -3,14 +3,13 @@ using System.Security.Claims;
 using Api.ErrorHandler;
 using Application.Interfaces.Auth;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 
 namespace Api.Controllers.Auth
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/auth/[controller]")]
     public class Login(ILogin login) : ControllerBase
     {
         private readonly ILogin _login = login;
@@ -28,6 +27,7 @@ namespace Api.Controllers.Auth
                     return Unauthorized();
 
                 ClaimsPrincipal principal = await _login.Execute(authHeader);
+                Console.WriteLine("User authenticated: " + principal.Identity?.Name);
                 await HttpContext.SignInAsync("AppCookie", principal);
 
                 return Ok(new { Message = "Login successful", User = principal.Identity?.Name });
